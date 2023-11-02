@@ -2,7 +2,11 @@ import base64
 import os
 import requests
 from flask import Flask, request, jsonify
-from flask_cors import CORS, cross_origin
+from flask_cors import CORS
+from haircut import (
+    generate_haircut_ai,
+)
+
 
 app = Flask(__name__)
 CORS(app)
@@ -13,33 +17,11 @@ MAX_CONTENT_LENGTH = 3 * 1024 * 1024
 
 base_url = "https://semaphore.co/api/v4/messages"
 api_key = "d976ae4a30b895246d9fc1bc1dabacdb"
+allowed_extensions = {"jpg", "jpeg", "png"}
 
 
-@app.route("/send_sms", methods=["POST"])
-def send_sms():
-    # address = get_client_location()
-    # return address
-    sender_name = "SEMAPHORE"
-    message = "Test Message"  # Replace Message Template
-    number = "09511808537"  # "09511808537,09915236234"  # Get from firebase
-    params = (
-        ("apikey", api_key),
-        ("sendername", sender_name),
-        ("message", message),
-        ("number", number),
-    )
-
-    response = requests.post(
-        base_url,
-        params=params,
-    )
-    return response.text
-
-
-# Define the route for uploading an image
-@app.route("/upload", methods=["POST"])
-def upload_image():
-    # Check if the 'image' field exists in the request
+@app.route("/generate-haircut", methods=["POST"])
+def ai_generate_haircut():
     if "image" not in request.files:
         return jsonify({"error": "No image part"})
 
@@ -47,12 +29,9 @@ def upload_image():
     image = request.files["image"]
     haircut = request.form.get("haircut")
 
-    # Check if the file is empty
     if image.filename == "":
         return jsonify({"error": "No selected file"})
 
-    # Check if the file is an allowed format (e.g., you can add more formats)
-    allowed_extensions = {"jpg", "jpeg", "png"}
     if (
         "." not in image.filename
         or image.filename.rsplit(".", 1)[1].lower() not in allowed_extensions
@@ -60,7 +39,46 @@ def upload_image():
         return jsonify({"error": "Invalid file format"})
 
     # Check if the file size is within the allowed limit
-    # if len(image.read()) > app.config["MAX_CONTENT_LENGTH"]:
+    if len(image.read()) > MAX_CONTENT_LENGTH:
+        return jsonify({"error": "File size exceeds the 3MB limit"})
+
+    # Reset the file cursor to read the image content again
+    image.seek(0)
+
+    # You can process the image here (optional)
+    image_data = generate_haircut_ai(image=image, haircut=haircut)
+
+    # # Read the image content and encode it as base64
+    # image_data = image_to_base64(image=img_generated_haircut)
+
+    # Create a JSON response with the base64-encoded image
+    response_data = {
+        "image_data": image_data,
+        "haircut": haircut,
+    }
+
+    return jsonify(response_data)
+
+
+@app.route("/upload", methods=["POST"])
+def upload_image():
+    if "image" not in request.files:
+        return jsonify({"error": "No image part"})
+
+    # Request Payload
+    image = request.files["image"]
+    haircut = request.form.get("haircut")
+
+    if image.filename == "":
+        return jsonify({"error": "No selected file"})
+
+    if (
+        "." not in image.filename
+        or image.filename.rsplit(".", 1)[1].lower() not in allowed_extensions
+    ):
+        return jsonify({"error": "Invalid file format"})
+
+    # Check if the file size is within the allowed limit
     if len(image.read()) > MAX_CONTENT_LENGTH:
         return jsonify({"error": "File size exceeds the 3MB limit"})
 
