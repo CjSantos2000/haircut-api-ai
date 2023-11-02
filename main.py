@@ -1,8 +1,10 @@
 import base64
 import os
 from flask import Flask, request, jsonify
+from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
+CORS(app)
 
 # Set the maximum file size for uploads to 3MB (3 * 1024 * 1024 bytes)
 MAX_CONTENT_LENGTH = 3 * 1024 * 1024
