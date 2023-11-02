@@ -1,5 +1,6 @@
 import base64
 import os
+import requests
 from flask import Flask, request, jsonify
 from flask_cors import CORS, cross_origin
 
@@ -8,6 +9,31 @@ CORS(app)
 
 # Set the maximum file size for uploads to 3MB (3 * 1024 * 1024 bytes)
 MAX_CONTENT_LENGTH = 3 * 1024 * 1024
+
+
+base_url = "https://semaphore.co/api/v4/messages"
+api_key = "d976ae4a30b895246d9fc1bc1dabacdb"
+
+
+@app.route("/send_sms", methods=["POST"])
+def send_sms():
+    # address = get_client_location()
+    # return address
+    sender_name = "SEMAPHORE"
+    message = "Test Message"  # Replace Message Template
+    number = "09511808537"  # "09511808537,09915236234"  # Get from firebase
+    params = (
+        ("apikey", api_key),
+        ("sendername", sender_name),
+        ("message", message),
+        ("number", number),
+    )
+
+    response = requests.post(
+        base_url,
+        params=params,
+    )
+    return response.text
 
 
 # Define the route for uploading an image
