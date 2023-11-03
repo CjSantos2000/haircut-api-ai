@@ -50,9 +50,9 @@ def generate_haircut_ai(*, image, haircut: int):
         if not generated_image:
             return "Failed to generate haircut: " + task_result.get("error_msg")
 
-        image_path, _ = urllib.request.urlretrieve(generated_image, "haircut-image.jpg")
-
-        return image_to_base64(image_path=image_path)
+        # image_path, _ = urllib.request.urlretrieve(generated_image, "haircut-image.jpg")
+        # image_to_base64(image_path=image_path)
+        return generated_image
 
     except Exception as e:
         print(e)
@@ -62,10 +62,12 @@ def generate_haircut_ai(*, image, haircut: int):
 def get_haircut_image_async_task_result(*, task_id: str):
     headers = {"ailabapi-api-key": API_KEY}
     max_retries = 20  # Define the maximum number of retries
-    retry_interval = 2  # Retry every 2 seconds
+    retry_interval = 1  # Retry every 2 seconds
 
     for retry in range(max_retries):
         try:
+            time.sleep(2)
+
             result = requests.get(
                 BASE_URL + GET_ASYNC_TASK_QUERY_ENDPOINT,
                 headers=headers,

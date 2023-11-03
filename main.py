@@ -48,9 +48,6 @@ def ai_generate_haircut():
     # You can process the image here (optional)
     image_data = generate_haircut_ai(image=image, haircut=haircut)
 
-    # # Read the image content and encode it as base64
-    # image_data = image_to_base64(image=img_generated_haircut)
-
     # Create a JSON response with the base64-encoded image
     response_data = {
         "image_data": image_data,
