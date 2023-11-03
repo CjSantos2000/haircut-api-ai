@@ -91,6 +91,7 @@ def upload_image():
     response_data = {
         "haircut": haircut,
         "image_data": "https://img.hair.ailabapi.com/20231103/UnderCut_20231103045909865587_dgwcndcxa48ftj1cy5mq.png",
+        "image": str(image),
     }
 
     return jsonify(response_data)
