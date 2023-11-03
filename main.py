@@ -89,9 +89,8 @@ def upload_image():
 
     # Create a JSON response with the base64-encoded image
     response_data = {
-        "filename": image.filename,
-        "image_data": image_data,
         "haircut": haircut,
+        "image_data": "https://img.hair.ailabapi.com/20231103/UnderCut_20231103045909865587_dgwcndcxa48ftj1cy5mq.png",
     }
 
     return jsonify(response_data)
